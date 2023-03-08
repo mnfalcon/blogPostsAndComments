@@ -19,7 +19,7 @@ public class PostService {
     private PostRepository postRepository;
 
     public boolean postExists(Post post) {
-        return postRepository.findById(post.getId()).isPresent();
+        return postRepository.existsById(post.getId());
     }
 
     public Post save(Post post) {
