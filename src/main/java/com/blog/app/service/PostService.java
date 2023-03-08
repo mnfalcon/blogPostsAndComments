@@ -40,6 +40,6 @@ public class PostService {
     }
 
     public List<Post> searchPosts(String param) {
-        return postRepository.findByTitleLike("%" + param + "%");
+        return postRepository.findByTitleContaining(param);
     }
 }

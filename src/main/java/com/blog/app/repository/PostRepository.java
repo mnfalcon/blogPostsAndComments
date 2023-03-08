@@ -8,6 +8,5 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-//    @Query("SELECT p FROM Post p WHERE p.title LIKE %:param%")
-    List<Post> findByTitleLike(String param);
+    List<Post> findByTitleContaining(String param);
 }
