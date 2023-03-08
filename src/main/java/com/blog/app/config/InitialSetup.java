@@ -8,14 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-@Component
+@Configuration
 @Slf4j
 public class InitialSetup implements CommandLineRunner {
 
@@ -41,7 +39,6 @@ public class InitialSetup implements CommandLineRunner {
                 String commentsUrl = String.format(REMOTE_COMMENTS_URL, remotePosts[i].getId());
                 Comment[] comments = restTemplate.getForObject(commentsUrl, Comment[].class);
 
-
                 if (comments != null && comments.length > 0) {
                     for (Comment c : comments) {
                         c.setPost(remotePosts[i]);
@@ -50,19 +47,9 @@ public class InitialSetup implements CommandLineRunner {
                     remotePosts[i].setComments(List.of(comments));
                 }
                 posts.add(remotePosts[i]);
-//                System.out.println(remotePosts[i].getComments());
-//                postService.save(remotePosts[i]);
             }
         }
         postService.save(posts);
         log.info("Remote posts saved or already existed.");
-
-        Comment c = Comment.builder()
-                .post(remotePosts[0])
-                .body("hello")
-                .email("atl@email.com")
-                .name("Atl")
-                .build();
-        commentService.save(c);
     }
 }
