@@ -28,8 +28,6 @@ public class Post implements Serializable {
     private String title;
     private String body;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    @NotFound(action = NotFoundAction.IGNORE)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "post")
     private List<Comment> comments;
 }

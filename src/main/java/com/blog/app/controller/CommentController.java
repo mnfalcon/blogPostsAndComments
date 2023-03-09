@@ -23,7 +23,7 @@ public class CommentController {
     *       @JsonIdentityReference(alwaysAsId = true)
     *       @JsonProperty(value = "post_id")
     * */
-    @GetMapping("/{postId}")
+    @GetMapping("/post/{postId}")
     public List<CommentDTO> findByPostId(@PathVariable Long postId) {
         return commentService.findByPostId(postId);
     }

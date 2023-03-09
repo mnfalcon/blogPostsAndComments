@@ -60,7 +60,6 @@ public class InitialSetup implements CommandLineRunner {
                         for (Comment c : comments) {
                             c.setPost(remotePost);
                         }
-                        commentService.save(List.of(comments));
                         remotePost.setComments(List.of(comments));
                     }
                     posts.add(remotePost);
