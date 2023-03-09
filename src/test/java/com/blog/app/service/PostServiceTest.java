@@ -102,8 +102,6 @@ public class PostServiceTest {
 
     @Test
     public void testFindByIdThrowsNotFound() {
-        Post post = posts.get(0);
-        Long id = post.getId();
         Mockito.when(postRepository.findById(999L))
                 .thenReturn(Optional.ofNullable(null));
         assertThrows(NotFoundException.class, () -> {

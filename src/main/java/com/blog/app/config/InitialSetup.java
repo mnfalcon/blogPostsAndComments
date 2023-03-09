@@ -43,7 +43,6 @@ public class InitialSetup implements CommandLineRunner {
             saveRemoteData(remotePosts);
         } catch (Exception e) {
             log.error("Fetching failed with exception: " + e.getMessage());
-            log.info(REMOTE_POSTS_URL);
             e.printStackTrace();
         }
     }

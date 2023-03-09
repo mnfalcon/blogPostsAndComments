@@ -28,7 +28,7 @@ public class PostController {
 
     /*
     * The search parameter could be included in the getPostsByPage method with the @RequestParam
-    * annotation.
+    * annotation. The logic would have to be modified accordingly.
     * */
     @GetMapping("/search/{param}")
     public List<Post> searchPosts(@PathVariable String param) {

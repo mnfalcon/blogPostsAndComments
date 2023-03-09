@@ -13,6 +13,8 @@ public class CommentDTO {
     private String email;
     private String body;
 
+
+    // This
     public CommentDTO(Comment c) {
         this.id = c.getId();
         this.postId = c.getPost().getId();

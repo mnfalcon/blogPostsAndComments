@@ -1,6 +1,5 @@
 package com.blog.app.service;
 
-import com.blog.app.exception.NotFoundException;
 import com.blog.app.model.Comment;
 import com.blog.app.model.CommentDTO;
 import com.blog.app.model.Post;
@@ -8,7 +7,6 @@ import com.blog.app.repository.CommentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -17,8 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -77,15 +73,8 @@ class CommentServiceTest {
         List<CommentDTO> commentDTOs = comments.stream().map(CommentDTO::new).toList();
         assertEquals(commentDTOs, commentService.findByPostId(id));
         Mockito.verify(commentRepository).findAllByPostId(id);
-    }
 
-    @Test
-    public void findByPostIdThrowsNotFound() {
-        Long id = 999L;
-        Mockito.when(commentRepository.findAllByPostId(999L))
-                .thenReturn(null);
-        assertThrows(NotFoundException.class, () -> {
-            commentService.findByPostId(id);
-        });
+        Mockito.when(commentRepository.findAllByPostId(id)).thenAnswer((InvocationOnMock invocation) -> new ArrayList<>());
+        assertTrue(commentService.findByPostId(id).isEmpty());
     }
 }
