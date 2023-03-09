@@ -6,6 +6,7 @@ import com.blog.app.service.CommentService;
 import com.blog.app.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -22,34 +23,52 @@ public class InitialSetup implements CommandLineRunner {
     @Autowired
     private CommentService commentService;
     private final RestTemplate restTemplate;
-    private final String REMOTE_POSTS_URL = "https://jsonplaceholder.typicode.com/posts";
-    private final String REMOTE_COMMENTS_URL = "https://jsonplaceholder.typicode.com/posts/%d/comments";
+    private final String REMOTE_POSTS_URL;
+    private final String REMOTE_COMMENTS_URL;
 
-    public InitialSetup() {
+    public InitialSetup(@Value("${app.remote.posts.url}") String postsUrl, @Value("${app.remote.comments.url}") String commentsUrl) {
         this.restTemplate = new RestTemplate();
+        this.REMOTE_POSTS_URL = postsUrl;
+        this.REMOTE_COMMENTS_URL = commentsUrl;
     }
 
     @Override
     public void run(String... args) throws Exception {
         log.info("Fetching remote posts");
-        Post[] remotePosts = restTemplate.getForObject(REMOTE_POSTS_URL, Post[].class);
-        ArrayList<Post> posts = new ArrayList<>();
-        for (int i = 0; i < remotePosts.length; i++) {
-            if (!postService.postExists(remotePosts[i])) {
-                String commentsUrl = String.format(REMOTE_COMMENTS_URL, remotePosts[i].getId());
-                Comment[] comments = restTemplate.getForObject(commentsUrl, Comment[].class);
-
-                if (comments != null && comments.length > 0) {
-                    for (Comment c : comments) {
-                        c.setPost(remotePosts[i]);
-                    }
-                    commentService.save(comments);
-                    remotePosts[i].setComments(List.of(comments));
-                }
-                posts.add(remotePosts[i]);
-            }
+        Post[] remotePosts = {};
+        try {
+            remotePosts = restTemplate.getForObject(REMOTE_POSTS_URL, Post[].class);
+            saveRemoteData(remotePosts);
+        } catch (Exception e) {
+            log.error("Fetching failed with exception: " + e.getMessage());
+            log.info(REMOTE_POSTS_URL);
+            e.printStackTrace();
         }
-        postService.save(posts);
-        log.info("Remote posts saved or already existed.");
+    }
+
+    public void saveRemoteData(Post[] remotePosts) {
+
+        if (remotePosts != null && remotePosts.length > 0) {
+            ArrayList<Post> posts = new ArrayList<>();
+            for (Post remotePost : remotePosts) {
+                if (!postService.postExists(remotePost)) {
+                    String commentsUrl = String.format(REMOTE_COMMENTS_URL, remotePost.getId());
+                    Comment[] comments = restTemplate.getForObject(commentsUrl, Comment[].class);
+
+                    if (comments != null && comments.length > 0) {
+                        for (Comment c : comments) {
+                            c.setPost(remotePost);
+                        }
+                        commentService.save(comments);
+                        remotePost.setComments(List.of(comments));
+                    }
+                    posts.add(remotePost);
+                }
+            }
+            postService.save(posts);
+            log.info("Remote posts saved or already existed.");
+        } else {
+            log.info(String.format("Fetching from '%s' didn't return anything.", REMOTE_POSTS_URL));
+        }
     }
 }

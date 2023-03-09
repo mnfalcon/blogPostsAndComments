@@ -1,6 +1,6 @@
 package com.blog.app.controller;
 
-import com.blog.app.model.Comment;
+import com.blog.app.model.CommentDTO;
 import com.blog.app.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +17,14 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
+    /*
+    * Instead of returning a DTO, adding these annotations to 'Comment' on the 'post' field could also be an option
+    *       @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    *       @JsonIdentityReference(alwaysAsId = true)
+    *       @JsonProperty(value = "post_id")
+    * */
     @GetMapping("/{postId}")
-    public List<Comment> findByPostId(@PathVariable Long postId) {
+    public List<CommentDTO> findByPostId(@PathVariable Long postId) {
         return commentService.findByPostId(postId);
     }
 }
