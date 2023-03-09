@@ -26,8 +26,10 @@ public class InitialSetup implements CommandLineRunner {
     private final String REMOTE_POSTS_URL;
     private final String REMOTE_COMMENTS_URL;
 
-    public InitialSetup(@Value("${app.remote.posts.url}") String postsUrl, @Value("${app.remote.comments.url}") String commentsUrl) {
-        this.restTemplate = new RestTemplate();
+    public InitialSetup(@Autowired RestTemplate restTemplate,
+                        @Value("${app.remote.posts.url}") String postsUrl,
+                        @Value("${app.remote.comments.url}") String commentsUrl) {
+        this.restTemplate = restTemplate;
         this.REMOTE_POSTS_URL = postsUrl;
         this.REMOTE_COMMENTS_URL = commentsUrl;
     }
@@ -51,7 +53,7 @@ public class InitialSetup implements CommandLineRunner {
         if (remotePosts != null && remotePosts.length > 0) {
             ArrayList<Post> posts = new ArrayList<>();
             for (Post remotePost : remotePosts) {
-                if (!postService.postExists(remotePost)) {
+                if (!postService.postExists(remotePost.getId())) {
                     String commentsUrl = String.format(REMOTE_COMMENTS_URL, remotePost.getId());
                     Comment[] comments = restTemplate.getForObject(commentsUrl, Comment[].class);
 
@@ -59,7 +61,7 @@ public class InitialSetup implements CommandLineRunner {
                         for (Comment c : comments) {
                             c.setPost(remotePost);
                         }
-                        commentService.save(comments);
+                        commentService.save(List.of(comments));
                         remotePost.setComments(List.of(comments));
                     }
                     posts.add(remotePost);

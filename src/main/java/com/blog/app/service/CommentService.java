@@ -1,5 +1,6 @@
 package com.blog.app.service;
 
+import com.blog.app.exception.NotFoundException;
 import com.blog.app.model.Comment;
 import com.blog.app.model.CommentDTO;
 import com.blog.app.repository.CommentRepository;
@@ -14,9 +15,11 @@ public class CommentService {
 
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
+    private PostService postService;
 
-    public void save(Comment[] comments) {
-        commentRepository.saveAll(List.of(comments));
+    public List<Comment> save(List<Comment> comments) {
+        return commentRepository.saveAll(comments);
     }
 
     public Comment save(Comment c) {
@@ -24,7 +27,10 @@ public class CommentService {
     }
 
     public List<CommentDTO> findByPostId(Long postId) {
-        return commentRepository.findAllByPostId(postId).stream()
+        List<Comment> comments = commentRepository.findAllByPostId(postId);
+        if (comments == null || comments.isEmpty())
+            throw new NotFoundException(String.format("Post with id '%d' not found or it has no comments", postId));
+        return comments.stream()
                 .map(CommentDTO::new)
                 .collect(Collectors.toList());
     }
