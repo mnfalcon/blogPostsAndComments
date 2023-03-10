@@ -28,13 +28,11 @@ public class GlobalExceptionHandler {
     }
 
     private ExceptionResponse createExceptionResponse(String message, HttpStatus status) {
-        ExceptionResponse e = new ExceptionResponse();
-
-        e.setStatus(status.value());
-        e.setMessage(message);
-        e.setTimeStamp(LocalDateTime.now().toString());
-
-        return e;
+        return ExceptionResponse.builder()
+                .status(status.value())
+                .message(message)
+                .timeStamp(LocalDateTime.now().toString())
+                .build();
     }
 
 }
